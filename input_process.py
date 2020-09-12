@@ -5,6 +5,7 @@ import re
 import numpy as np
 import pandas as pd
 import ujson as json
+import json as jjson
 
 patient_ids = []
 
@@ -54,7 +55,7 @@ def parse_data(x):
     values = []
 
     for attr in attributes:
-        if x.has_key(attr):
+        if attr in x:
             values.append(x[attr])
         else:
             values.append(np.nan)
@@ -136,7 +137,10 @@ def parse_id(id_):
     rec['forward'] = parse_rec(values, masks, evals, eval_masks, dir_='forward')
     rec['backward'] = parse_rec(values[::-1], masks[::-1], evals[::-1], eval_masks[::-1], dir_='backward')
 
-    rec = json.dumps(rec)
+    def default(o):
+        if isinstance(o, np.integer): return int(o)
+        raise TypeError
+    rec = jjson.dumps(rec,default=default)
 
     fs.write(rec + '\n')
 
